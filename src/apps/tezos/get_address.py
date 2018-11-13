@@ -11,7 +11,9 @@ from apps.tezos.helpers import (
 
 
 async def get_address(ctx, msg):
-    node = await seed.derive_node(ctx, msg.address_n, TEZOS_CURVE)
+    keychain = await seed.get_keychain(ctx)
+
+    node = keychain.derive(msg.address_n, TEZOS_CURVE)
 
     pk = seed.remove_ed25519_prefix(node.public_key())
     pkh = hashlib.blake2b(pk, outlen=20).digest()

@@ -12,8 +12,10 @@ from apps.common import seed
 
 
 async def sign_tx(ctx, msg: RippleSignTx):
+    keychain = await seed.get_keychain(ctx)
+
     validate(msg)
-    node = await seed.derive_node(ctx, msg.address_n)
+    node = keychain.derive(msg.address_n)
     source_address = helpers.address_from_public_key(node.public_key())
 
     set_canonical_flag(msg)

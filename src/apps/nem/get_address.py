@@ -8,8 +8,10 @@ from apps.common.layout import address_n_to_str, show_address, show_qr
 
 
 async def get_address(ctx, msg):
+    keychain = await seed.get_keychain(ctx)
+
     network = validate_network(msg.network)
-    node = await seed.derive_node(ctx, msg.address_n, NEM_CURVE)
+    node = keychain.derive(msg.address_n, NEM_CURVE)
     address = node.nem_address(network)
 
     if msg.show_display:

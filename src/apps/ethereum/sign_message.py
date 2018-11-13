@@ -19,10 +19,11 @@ def message_digest(message):
 
 
 async def sign_message(ctx, msg):
+    keychain = await seed.get_keychain(ctx)
+
     await require_confirm_sign_message(ctx, msg.message)
 
-    node = await seed.derive_node(ctx, msg.address_n)
-
+    node = keychain.derive(msg.address_n)
     signature = secp256k1.sign(
         node.private_key(),
         message_digest(msg.message),

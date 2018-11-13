@@ -11,6 +11,8 @@ from apps.wallet.sign_tx.addresses import get_address
 
 
 async def sign_message(ctx, msg):
+    keychain = await seed.get_keychain(ctx)
+
     message = msg.message
     address_n = msg.address_n
     coin_name = msg.coin_name or "Bitcoin"
@@ -19,7 +21,7 @@ async def sign_message(ctx, msg):
 
     await require_confirm_sign_message(ctx, message)
 
-    node = await seed.derive_node(ctx, address_n, curve_name=coin.curve_name)
+    node = keychain.derive(address_n, coin.curve_name)
     seckey = node.private_key()
 
     address = get_address(script_type, coin, node)

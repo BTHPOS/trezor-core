@@ -1,15 +1,18 @@
+from ubinascii import hexlify
+
+from trezor.crypto.curve import secp256k1
+from trezor.crypto.hashlib import sha3_256
+from trezor.messages.EthereumAddress import EthereumAddress
+
+from apps.common import seed
 from apps.common.layout import address_n_to_str, show_address, show_qr
 from apps.ethereum import networks
 
 
 async def get_address(ctx, msg):
-    from trezor.messages.EthereumAddress import EthereumAddress
-    from trezor.crypto.curve import secp256k1
-    from trezor.crypto.hashlib import sha3_256
-    from apps.common import seed
+    keychain = await seed.get_keychain(ctx)
 
-    node = await seed.derive_node(ctx, msg.address_n)
-
+    node = keychain.derive(msg.address_n)
     seckey = node.private_key()
     public_key = secp256k1.publickey(seckey, False)  # uncompressed
     address = sha3_256(public_key[1:], keccak=True).digest()[12:]
@@ -31,14 +34,11 @@ async def get_address(ctx, msg):
 
 
 def _ethereum_address_hex(address, network=None):
-    from ubinascii import hexlify
-    from trezor.crypto.hashlib import sha3_256
-
-    rskip60 = network is not None and network.rskip60
-
+    if network is not None and network.rskip60:
+        prefix = str(network.chain_id) + "0x"
+    else:
+        prefix = ""
     hx = hexlify(address).decode()
-
-    prefix = str(network.chain_id) + "0x" if rskip60 else ""
     hs = sha3_256(prefix + hx, keccak=True).digest()
     h = ""
 

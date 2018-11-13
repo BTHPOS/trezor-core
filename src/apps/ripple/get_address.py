@@ -8,7 +8,9 @@ from apps.common.layout import address_n_to_str, show_address, show_qr
 
 
 async def get_address(ctx, msg: RippleGetAddress):
-    node = await seed.derive_node(ctx, msg.address_n)
+    keychain = await seed.get_keychain(ctx)
+
+    node = keychain.derive(msg.address_n)
     pubkey = node.public_key()
     address = helpers.address_from_public_key(pubkey)
 

@@ -26,9 +26,11 @@ async def sign_message(ctx, msg):
     message = msg.message
     address_n = msg.address_n
 
+    keychain = await seed.get_keychain(ctx)
+
     await require_confirm_sign_message(ctx, message)
 
-    node = await seed.derive_node(ctx, address_n, LISK_CURVE)
+    node = keychain.derive(address_n, LISK_CURVE)
     seckey = node.private_key()
     pubkey = node.public_key()
     pubkey = pubkey[1:]  # skip ed25519 pubkey marker

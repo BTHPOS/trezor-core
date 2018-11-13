@@ -10,8 +10,10 @@ from apps.common import seed
 
 
 async def sign_tx(ctx, msg: NEMSignTx):
+    keychain = await seed.get_keychain(ctx)
+
     validate(msg)
-    node = await seed.derive_node(ctx, msg.transaction.address_n, NEM_CURVE)
+    node = keychain.derive(msg.transaction.address_n, NEM_CURVE)
 
     if msg.multisig:
         public_key = msg.multisig.signer

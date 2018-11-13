@@ -10,8 +10,9 @@ from apps.tezos.helpers import TEZOS_CURVE, TEZOS_PUBLICKEY_PREFIX, base58_encod
 
 
 async def get_public_key(ctx, msg):
-    node = await seed.derive_node(ctx, msg.address_n, TEZOS_CURVE)
+    keychain = await seed.get_keychain(ctx)
 
+    node = keychain.derive(msg.address_n, TEZOS_CURVE)
     pk = seed.remove_ed25519_prefix(node.public_key())
     pk_prefixed = base58_encode_check(pk, prefix=TEZOS_PUBLICKEY_PREFIX)
 
